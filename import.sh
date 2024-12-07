@@ -13,6 +13,8 @@ while IFS= read -r line; do
 	
 	filename=$(basename "$1" | sed 's/%20/ /g')
 
+	mv "$homebrew_dir"/$(basename "$1") "$filename"
+
     if [ -n "$HB_IMPORTS" ]; then
         HB_IMPORTS="$HB_IMPORTS,\"$filename\""
     else
