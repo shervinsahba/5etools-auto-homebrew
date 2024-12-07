@@ -12,7 +12,8 @@ while IFS= read -r line; do
     set -- $line
     
     # Download the file with wget
-    wget -N --directory-prefix "$homebrew_dir" "$2"
+	rm "$homebrew_dir"/"$1"
+    wget --directory-prefix "$homebrew_dir" "$2"
     
     # Get the filename from the URL
     filename=$(basename "$2")
