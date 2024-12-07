@@ -20,8 +20,6 @@ while IFS= read -r line; do
     fi
 done < homebrew_urls
 
-HB_IMPORTS="\"$HB_IMPORTS\""
-
 # Update the index.json file with the new import list
 sed -i "s/\"toImport\".*/\"toImport\":\ [$HB_IMPORTS]/" "$homebrew_dir"/index.json
 
