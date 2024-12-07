@@ -1,19 +1,27 @@
-#!/bin/bash
+#!/bin/sh
 
 homebrew_dir="/var/www/localhost/htdocs/homebrew"
 
-HB_IMPORTS=()
+HB_IMPORTS=""
 
-while read line; do
-	read -a array <<< "$line"
-	wget -N --directory-prefix "$homebrew_dir" "${array[1]}"
-	filename=$(basename "${array[1]}")
-	filename=$(echo "$filename" | sed 's/%20/ /g')
-	mv "$filename" "${array[0]}"
-	HB_IMPORTS+=("${array[0]}")
-done <homebrew_urls
+# Process each line in the homebrew_urls file
+while IFS= read -r line; do
+    # Split the line by spaces into positional parameters
+    set -- $line
+    
+    wget --directory-prefix "$homebrew_dir" "$1"
+	
+	filename=$(basename "$1" | sed 's/%20/ /g')
 
-IFS=','
-printf -v HB_IMPORTS '"%s",' ${HB_IMPORTS[@]}
- 
-sed -i s/\"toImport\".*/\"toImport\"\:\ \["${HB_IMPORTS%,}"\]/ "$homebrew_dir"/index.json
+    if [ -n "$HB_IMPORTS" ]; then
+        HB_IMPORTS="$HB_IMPORTS,\"$filename\""
+    else
+        HB_IMPORTS=\""$filename"\"
+    fi
+done < homebrew_urls
+
+HB_IMPORTS="\"$HB_IMPORTS\""
+
+# Update the index.json file with the new import list
+sed -i "s/\"toImport\".*/\"toImport\":\ [$HB_IMPORTS]/" "$homebrew_dir"/index.json
+
